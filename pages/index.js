@@ -31,7 +31,7 @@ export default function Home() {
       date,
       sports: ['FOOT', 'TENN', 'CYCL'],
     };
-    const res = await fetch('http://localhost:3000/api/sports', {
+    const res = await fetch('https://sports-eight.vercel.app/api/sports', {
       method: 'POST',
       body: JSON.stringify(request),
     });
