@@ -17,7 +17,7 @@ const Leagues = ({ onChange }) => {
   };
 
   useEffect(() => {
-    loadData();
+    // loadData();
   }, []);
 
   const children = [];

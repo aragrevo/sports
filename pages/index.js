@@ -11,6 +11,7 @@ import {
   List,
   Statistic,
   Skeleton,
+  Select,
 } from 'antd';
 import {
   ArrowUpOutlined,
@@ -24,20 +25,40 @@ import Leagues from '../components/Leagues';
 const { Header, Content, Footer } = Layout;
 const { Meta } = Card;
 const { SubMenu } = Menu;
+const { Option } = Select;
 
 export default function Home() {
-  const [leagues, setLeagues] = useState(['Inglaterra - Premier League']);
+  const [leagues, setLeagues] = useState([]);
+  const [selectedLeagues, setSelectedLeagues] = useState([]);
   const [data, setData] = useState([]);
+  const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const onSelect = (e) => {
     console.log(e);
-    setLeagues(e);
+    setSelectedLeagues(e);
+    const newData = data.reduce((acc, group) => {
+      const time = group.time;
+      const events = group.events.filter((event) =>
+        selectedLeagues.includes(event.title)
+      );
+
+      acc.push({
+        time,
+        events,
+      });
+      return acc;
+    }, []);
+    setMatches(newData.filter((m) => m.events.length > 0));
+  };
+
+  const formatDate = (d = new Date()) => {
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   };
 
   const loadData = async () => {
+    // const date = formatDate();
     const date = new Date().toISOString().split('T')[0];
-
     const request = {
       date,
       sports: ['FOOT', 'TENN', 'CYCL'],
@@ -48,30 +69,37 @@ export default function Home() {
     });
 
     const { data } = await res.json();
-    // const newData = data.reduce((acc, sport) => {
-    //   return [...acc, ...sport];
-    // }, []);
+    const newData = data.reduce((acc, sport) => {
+      return [...acc, ...sport];
+    }, []);
 
-    // const newData2 = newData.map((group) => {
-    //   const newEvents = group.events.map((event) => {
-    //     const parts = event.title.split('-');
-    //     const partCero = parts[0].split(',');
-    //     return {
-    //       ...event,
-    //       sport: partCero[0],
-    //       region: partCero[1],
-    //       country: parts[1],
-    //       league: parts[2],
-    //     };
-    //   });
-    //   return {
-    //     time: group.time,
-    //     events: newEvents,
-    //   };
-    // });
+    const tmpLeagues = [];
 
-    console.log(data);
-    // setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
+    const newData2 = newData.map((group) => {
+      const newEvents = group.events.map((event) => {
+        const parts = event.title.split('-');
+        const partCero = parts[0].split(',');
+        tmpLeagues.push(event.title);
+        // tmpLeagues.push(parts[2].trimEnd().trimStart());
+        return {
+          ...event,
+          sport: partCero[0],
+          region: partCero[1],
+          country: parts[1],
+          league: parts[2].trimEnd().trimStart(),
+        };
+      });
+      return {
+        time: group.time,
+        events: newEvents,
+      };
+    });
+
+    console.log(newData2);
+    const uniqueLeagues = [...new Set(tmpLeagues)];
+    setLeagues(uniqueLeagues);
+    setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
+    setMatches(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
     setLoading(false);
   };
 
@@ -80,6 +108,15 @@ export default function Home() {
     setLoading(true);
     loadData();
   }, []);
+
+  const children = [];
+  leagues.forEach((l, i) => {
+    children.push(
+      <Option key={i.toString(36) + i} value={l} label={l}>
+        {l}
+      </Option>
+    );
+  });
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -101,8 +138,20 @@ export default function Home() {
         </Header>
         <Content style={{ margin: '0 16px' }}>
           {loading && <Skeleton />}
-          {/* {data.length > 0 &&
-            data.map((m, i) => (
+          {!loading && (
+            <Select
+              mode='multiple'
+              allowClear
+              style={{ width: '100%' }}
+              placeholder='Please select'
+              defaultValue={[]}
+              onChange={onSelect}
+            >
+              {children}
+            </Select>
+          )}
+          {data.length > 0 &&
+            matches.map((m, i) => (
               <div key={i}>
                 <Breadcrumb>
                   <Breadcrumb.Item>{m.time}</Breadcrumb.Item>
@@ -141,7 +190,7 @@ export default function Home() {
                   )}
                 />
               </div>
-            ))} */}
+            ))}
         </Content>
         <Footer style={{ textAlign: 'center' }}>
           Ant Design ©2018 Created by Ant UED
