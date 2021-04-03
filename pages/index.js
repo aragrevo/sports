@@ -27,11 +27,12 @@ export default function Home() {
 
   const loadData = async () => {
     const date = new Date().toISOString().split('T')[0];
+
     const request = {
       date,
       sports: ['FOOT', 'TENN', 'CYCL'],
     };
-    const res = await fetch('https://sports-eight.vercel.app/api/sports', {
+    const res = await fetch('/api/sports', {
       method: 'POST',
       body: JSON.stringify(request),
     });
