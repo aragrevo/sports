@@ -2,7 +2,16 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import 'antd/dist/antd.css';
 import Matches from '../components/Matches';
-import { Layout, Menu, Breadcrumb, Card, Avatar, List, Statistic } from 'antd';
+import {
+  Layout,
+  Menu,
+  Breadcrumb,
+  Card,
+  Avatar,
+  List,
+  Statistic,
+  Skeleton,
+} from 'antd';
 import {
   ArrowUpOutlined,
   PieChartOutlined,
@@ -19,6 +28,7 @@ const { SubMenu } = Menu;
 export default function Home() {
   const [leagues, setLeagues] = useState(['Inglaterra - Premier League']);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const onSelect = (e) => {
     console.log(e);
@@ -62,10 +72,12 @@ export default function Home() {
 
     console.log(newData2);
     setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
+    setLoading(false);
   };
 
   useEffect(() => {
     console.log('efecto');
+    setLoading(true);
     loadData();
   }, []);
 
@@ -88,6 +100,7 @@ export default function Home() {
           </Menu>
         </Header>
         <Content style={{ margin: '0 16px' }}>
+          {loading && <Skeleton />}
           {data.length > 0 &&
             data.map((m, i) => (
               <div key={i}>
@@ -95,6 +108,7 @@ export default function Home() {
                   <Breadcrumb.Item>{m.time}</Breadcrumb.Item>
                 </Breadcrumb>
                 <List
+                  loading={loading}
                   grid={{ gutter: 16, column: 3 }}
                   dataSource={m.events}
                   renderItem={(event) => (
