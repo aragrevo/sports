@@ -48,30 +48,30 @@ export default function Home() {
     });
 
     const { data } = await res.json();
-    const newData = data.reduce((acc, sport) => {
-      return [...acc, ...sport];
-    }, []);
+    // const newData = data.reduce((acc, sport) => {
+    //   return [...acc, ...sport];
+    // }, []);
 
-    const newData2 = newData.map((group) => {
-      const newEvents = group.events.map((event) => {
-        const parts = event.title.split('-');
-        const partCero = parts[0].split(',');
-        return {
-          ...event,
-          sport: partCero[0],
-          region: partCero[1],
-          country: parts[1],
-          league: parts[2],
-        };
-      });
-      return {
-        time: group.time,
-        events: newEvents,
-      };
-    });
+    // const newData2 = newData.map((group) => {
+    //   const newEvents = group.events.map((event) => {
+    //     const parts = event.title.split('-');
+    //     const partCero = parts[0].split(',');
+    //     return {
+    //       ...event,
+    //       sport: partCero[0],
+    //       region: partCero[1],
+    //       country: parts[1],
+    //       league: parts[2],
+    //     };
+    //   });
+    //   return {
+    //     time: group.time,
+    //     events: newEvents,
+    //   };
+    // });
 
-    console.log(newData2);
-    setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
+    console.log(data);
+    // setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
     setLoading(false);
   };
 
@@ -101,7 +101,7 @@ export default function Home() {
         </Header>
         <Content style={{ margin: '0 16px' }}>
           {loading && <Skeleton />}
-          {data.length > 0 &&
+          {/* {data.length > 0 &&
             data.map((m, i) => (
               <div key={i}>
                 <Breadcrumb>
@@ -141,7 +141,7 @@ export default function Home() {
                   )}
                 />
               </div>
-            ))}
+            ))} */}
         </Content>
         <Footer style={{ textAlign: 'center' }}>
           Ant Design ©2018 Created by Ant UED

@@ -16,7 +16,8 @@ export default async (req, res) => {
     return tmpData;
   });
 
-  Promise.all(data).then((resp) => {
-    res.status(200).json({ data: resp });
-  });
+  // Promise.all(data).then((resp) => {
+  //   res.status(200).json({ data: resp });
+  // });
+  res.status(200).json({ data: 'ok' });
 };
