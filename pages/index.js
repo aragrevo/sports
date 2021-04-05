@@ -21,6 +21,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import Leagues from '../components/Leagues';
+import { fetchLatestMatches } from '../firebase/client';
 
 const { Header, Content, Footer } = Layout;
 const { Meta } = Card;
@@ -56,51 +57,46 @@ export default function Home() {
     return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   };
 
-  const loadData = async () => {
-    // const date = formatDate();
-    const date = new Date().toISOString().split('T')[0];
-    const request = {
-      date,
-      sports: ['FOOT', 'TENN', 'CYCL'],
-    };
-    const res = await fetch('/api/sports', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+  const loadData = () => {
+    fetchLatestMatches().then((data) => {
+      debugger;
+      console.log(data);
+      // const newData = data.reduce((acc, sport) => {
+      //   return [...acc, ...sport];
+      // }, []);
 
-    const { data } = await res.json();
-    const newData = data.reduce((acc, sport) => {
-      return [...acc, ...sport];
-    }, []);
+      const tmpLeagues = [];
 
-    const tmpLeagues = [];
-
-    const newData2 = newData.map((group) => {
-      const newEvents = group.events.map((event) => {
-        const parts = event.title.split('-');
-        const partCero = parts[0].split(',');
-        tmpLeagues.push(event.title);
-        // tmpLeagues.push(parts[2].trimEnd().trimStart());
+      const newData2 = data.map((group) => {
+        const newEvents = group.events.map((event) => {
+          const parts = event.title.split('-');
+          const partCero = parts[0].split(',');
+          tmpLeagues.push(event.title);
+          // tmpLeagues.push(parts[2].trimEnd().trimStart());
+          return {
+            ...event,
+            match: event.match.split(/st[0-9]{1,3}/)[0],
+            sport: partCero[0],
+            region: partCero[1],
+            country: parts[1],
+            league: parts[2].trimEnd().trimStart(),
+          };
+        });
         return {
-          ...event,
-          sport: partCero[0],
-          region: partCero[1],
-          country: parts[1],
-          league: parts[2].trimEnd().trimStart(),
+          time: group.time,
+          events: newEvents,
         };
       });
-      return {
-        time: group.time,
-        events: newEvents,
-      };
-    });
 
-    console.log(newData2);
-    const uniqueLeagues = [...new Set(tmpLeagues)];
-    setLeagues(uniqueLeagues);
-    setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
-    setMatches(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
-    setLoading(false);
+      console.log(newData2);
+      const uniqueLeagues = [...new Set(tmpLeagues)].sort((a, b) =>
+        a > b ? 1 : -1
+      );
+      setLeagues(uniqueLeagues);
+      setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
+      setMatches(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
@@ -144,7 +140,13 @@ export default function Home() {
               allowClear
               style={{ width: '100%' }}
               placeholder='Please select'
-              defaultValue={[]}
+              defaultValue={[
+                'Futbol,Italia -Serie A -',
+                'Futbol,Reino Unido -Inglaterra - Premier League -',
+                'Futbol,España -La Liga -',
+                'Futbol,Américas -Argentina - Copa de la Liga Profesional -',
+                'Futbol,Américas -Colombia - Primera A -',
+              ]}
               onChange={onSelect}
             >
               {children}
