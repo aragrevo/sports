@@ -1,4 +1,5 @@
 const fs = require('fs');
+
 const { getMatchesByDate } = require('./matchesByDate');
 
 const baseUrl = 'https://apuestas.wplay.co';
