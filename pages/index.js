@@ -59,7 +59,6 @@ export default function Home() {
 
   const loadData = () => {
     fetchLatestMatches().then((data) => {
-      debugger;
       console.log(data);
       // const newData = data.reduce((acc, sport) => {
       //   return [...acc, ...sport];

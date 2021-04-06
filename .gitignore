@@ -32,3 +32,13 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+### Firebase ###
+.idea
+**/node_modules/*
+**/.firebaserc
+service_key.json
+
+### Firebase Patch ###
+.runtimeconfig.json
+.firebase/

@@ -5,13 +5,17 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "scrapper": "node scripts/main.js",
+    "uploader": "node scripts/uploader.js",
+    "extract": "npm run scrapper && npm run uploader"
   },
   "dependencies": {
     "antd": "^4.13.0",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.5",
     "firebase": "^8.3.2",
+    "firebase-admin": "^9.6.0",
     "fs-extra": "^9.1.0",
     "next": "10.0.7",
     "react": "17.0.1",
