@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 
-const serviceAccount = require('./service_key.json');
+const serviceAccount = require('../service_key.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -9,7 +9,7 @@ admin.initializeApp({
 const firestore = admin.firestore();
 const path = require('path');
 const fs = require('fs');
-const directoryPath = path.join(__dirname, 'files');
+const directoryPath = path.join(__dirname, '../public/files');
 
 async function deleteCollection(path) {
   firestore

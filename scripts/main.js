@@ -22,7 +22,7 @@ Promise.all(data).then((sports) => {
   console.log('finish!');
   const x = sports.flat();
   fs.writeFile(
-    '../public/files/matches.json',
+    './public/files/matches.json',
     JSON.stringify(x),
     'utf8',
     function (error) {
