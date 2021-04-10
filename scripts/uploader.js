@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 const result = dotenv.config();
 
 if (result.error) {
-  throw result.error;
+  // throw result.error;
+  console.log(result.error);
 }
 
 // const serviceAccount = require('../service_key.json');
