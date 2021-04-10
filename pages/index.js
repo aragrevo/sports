@@ -7,14 +7,15 @@ import {
   Menu,
   Breadcrumb,
   Card,
-  Avatar,
+  BackTop,
   List,
   Statistic,
   Skeleton,
   Select,
+  Button,
 } from 'antd';
 import {
-  ArrowUpOutlined,
+  SyncOutlined,
   PieChartOutlined,
   FileOutlined,
   TeamOutlined,
@@ -51,6 +52,15 @@ export default function Home() {
       return acc;
     }, []);
     setMatches(newData.filter((m) => m.events.length > 0));
+  };
+
+  const handleUpdate = () => {
+    setLoading(true);
+    const hour = new Date().getHours();
+    console.log('update', hour);
+    const newData = matches.filter((m) => m.time.split(':')[0] >= hour);
+    setMatches(newData);
+    setLoading(false);
   };
 
   const formatDate = (d = new Date()) => {
@@ -134,22 +144,32 @@ export default function Home() {
         <Content style={{ margin: '0 16px' }}>
           {loading && <Skeleton />}
           {!loading && (
-            <Select
-              mode='multiple'
-              allowClear
-              style={{ width: '100%' }}
-              placeholder='Please select'
-              defaultValue={[
-                'Futbol,Italia -Serie A -',
-                'Futbol,Reino Unido -Inglaterra - Premier League -',
-                'Futbol,España -La Liga -',
-                'Futbol,Américas -Argentina - Copa de la Liga Profesional -',
-                'Futbol,Américas -Colombia - Primera A -',
-              ]}
-              onChange={onSelect}
-            >
-              {children}
-            </Select>
+            <>
+              <BackTop />
+              <Select
+                mode='multiple'
+                allowClear
+                style={{ width: '90%' }}
+                placeholder='Please select'
+                defaultValue={[
+                  'Futbol,Italia -Serie A -',
+                  'Futbol,Reino Unido -Inglaterra - Premier League -',
+                  'Futbol,España -La Liga -',
+                  'Futbol,Américas -Argentina - Copa de la Liga Profesional -',
+                  'Futbol,Américas -Colombia - Primera A -',
+                ]}
+                onChange={onSelect}
+              >
+                {children}
+              </Select>
+              <Button
+                type='primary'
+                shape='circle'
+                icon={<SyncOutlined />}
+                style={{ float: 'right', marginTop: '1%' }}
+                onClick={handleUpdate}
+              />
+            </>
           )}
           {data.length > 0 &&
             matches.map((m, i) => (
