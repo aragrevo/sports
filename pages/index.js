@@ -57,8 +57,22 @@ export default function Home() {
   const handleUpdate = () => {
     setLoading(true);
     const hour = new Date().getHours();
+
     console.log('update', hour);
     const newData = matches.filter((m) => m.time.split(':')[0] >= hour);
+    const tmpLeagues = data
+      .map((g) => {
+        if (g.time.split(':')[0] >= hour) {
+          const leg = g.events.map((e) => e.title);
+          return leg;
+        }
+      })
+      .filter((l) => l !== undefined)
+      .flat();
+    const uniqueLeagues = [...new Set(tmpLeagues)].sort((a, b) =>
+      a > b ? 1 : -1
+    );
+    setLeagues(uniqueLeagues);
     setMatches(newData);
     setLoading(false);
   };
