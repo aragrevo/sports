@@ -2,8 +2,8 @@ import {useState} from 'react';
 import axios from 'axios';
 
 export const useLinksYT = () => {
-  // const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const getLinks = url => {
     setLoading(true);
@@ -19,8 +19,24 @@ export const useLinksYT = () => {
         return [];
       });
   };
+
+  const downloadMusic = urls => {
+    setDownloading(true);
+    return axios
+      .post('/api/download_yt', {urls})
+      .then(res => {
+        setDownloading(false);
+        return res.data.data;
+      })
+      .catch(err => {
+        console.log(err);
+        setDownloading(false);
+      });
+  };
   return {
     isLoading: loading,
+    downloading,
     getLinks,
+    downloadMusic,
   };
 };
