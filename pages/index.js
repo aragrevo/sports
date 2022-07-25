@@ -1,33 +1,17 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import Link from 'next/link';
 import 'antd/dist/antd.css';
 import Matches from '../components/Matches';
-import {
-  Layout,
-  Menu,
-  Breadcrumb,
-  Card,
-  BackTop,
-  List,
-  Statistic,
-  Skeleton,
-  Select,
-  Button,
-} from 'antd';
-import {
-  SyncOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import {Layout, Menu, Breadcrumb, Card, BackTop, List, Statistic, Skeleton, Select, Button} from 'antd';
+import {SyncOutlined, PieChartOutlined, FileOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons';
 import Leagues from '../components/Leagues';
-import { fetchLatestMatches } from '../firebase/client';
+import {fetchLatestMatches} from '../firebase/client';
+import CustomLayout from '../components/layout/CustomLayout';
 
-const { Header, Content, Footer } = Layout;
-const { Meta } = Card;
-const { SubMenu } = Menu;
-const { Option } = Select;
+const {Header, Content, Footer} = Layout;
+const {Meta} = Card;
+const {SubMenu} = Menu;
+const {Option} = Select;
 
 export default function Home() {
   const [leagues, setLeagues] = useState([]);
@@ -36,14 +20,12 @@ export default function Home() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const onSelect = (e) => {
+  const onSelect = e => {
     console.log(e);
     setSelectedLeagues(e);
     const newData = data.reduce((acc, group) => {
       const time = group.time;
-      const events = group.events.filter((event) =>
-        selectedLeagues.includes(event.title)
-      );
+      const events = group.events.filter(event => selectedLeagues.includes(event.title));
 
       acc.push({
         time,
@@ -51,7 +33,7 @@ export default function Home() {
       });
       return acc;
     }, []);
-    setMatches(newData.filter((m) => m.events.length > 0));
+    setMatches(newData.filter(m => m.events.length > 0));
   };
 
   const handleUpdate = () => {
@@ -59,19 +41,17 @@ export default function Home() {
     const hour = new Date().getHours();
 
     console.log('update', hour);
-    const newData = matches.filter((m) => m.time.split(':')[0] >= hour);
+    const newData = matches.filter(m => m.time.split(':')[0] >= hour);
     const tmpLeagues = data
-      .map((g) => {
+      .map(g => {
         if (g.time.split(':')[0] >= hour) {
-          const leg = g.events.map((e) => e.title);
+          const leg = g.events.map(e => e.title);
           return leg;
         }
       })
-      .filter((l) => l !== undefined)
+      .filter(l => l !== undefined)
       .flat();
-    const uniqueLeagues = [...new Set(tmpLeagues)].sort((a, b) =>
-      a > b ? 1 : -1
-    );
+    const uniqueLeagues = [...new Set(tmpLeagues)].sort((a, b) => (a > b ? 1 : -1));
     setLeagues(uniqueLeagues);
     setMatches(newData);
     setLoading(false);
@@ -82,7 +62,7 @@ export default function Home() {
   };
 
   const loadData = () => {
-    fetchLatestMatches().then((data) => {
+    fetchLatestMatches().then(data => {
       console.log(data);
       // const newData = data.reduce((acc, sport) => {
       //   return [...acc, ...sport];
@@ -90,8 +70,8 @@ export default function Home() {
 
       const tmpLeagues = [];
 
-      const newData2 = data.map((group) => {
-        const newEvents = group.events.map((event) => {
+      const newData2 = data.map(group => {
+        const newEvents = group.events.map(event => {
           const parts = event.title.split('-');
           const partCero = parts[0].split(',');
           tmpLeagues.push(event.title);
@@ -112,9 +92,7 @@ export default function Home() {
       });
 
       console.log(newData2);
-      const uniqueLeagues = [...new Set(tmpLeagues)].sort((a, b) =>
-        a > b ? 1 : -1
-      );
+      const uniqueLeagues = [...new Set(tmpLeagues)].sort((a, b) => (a > b ? 1 : -1));
       setLeagues(uniqueLeagues);
       setData(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
       setMatches(newData2.sort((a, b) => (a.time > b.time ? 1 : -1)));
@@ -125,7 +103,7 @@ export default function Home() {
   useEffect(() => {
     console.log('efecto');
     setLoading(true);
-    loadData();
+    // loadData();
   }, []);
 
   const children = [];
@@ -133,104 +111,72 @@ export default function Home() {
     children.push(
       <Option key={i.toString(36) + i} value={l} label={l}>
         {l}
-      </Option>
+      </Option>,
     );
   });
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Layout>
-        <Header style={{ padding: 0 }}>
-          <Menu theme='dark' mode='horizontal' defaultSelectedKeys={['2']}>
-            <Menu.Item key='1'>
-              <Link href='/'>
-                <a>Home</a>
-              </Link>
-            </Menu.Item>
-            <Menu.Item key='2'>
-              <Link href='/today'>
-                <a>today</a>
-              </Link>
-            </Menu.Item>
-            <Menu.Item key='3'>nav 3</Menu.Item>
-          </Menu>
-        </Header>
-        <Content style={{ margin: '0 16px' }}>
-          {loading && <Skeleton />}
-          {!loading && (
-            <>
-              <BackTop />
-              <Select
-                mode='multiple'
-                allowClear
-                style={{ width: '90%' }}
-                placeholder='Please select'
-                defaultValue={[
-                  'Futbol,Italia -Serie A -',
-                  'Futbol,Reino Unido -Inglaterra - Premier League -',
-                  'Futbol,España -La Liga -',
-                  'Futbol,Américas -Argentina - Copa de la Liga Profesional -',
-                  'Futbol,Américas -Colombia - Primera A -',
-                ]}
-                onChange={onSelect}
-              >
-                {children}
-              </Select>
-              <Button
-                type='primary'
-                shape='circle'
-                icon={<SyncOutlined />}
-                style={{ float: 'right', marginTop: '1%' }}
-                onClick={handleUpdate}
-              />
-            </>
-          )}
-          {data.length > 0 &&
-            matches.map((m, i) => (
-              <div key={i}>
-                <Breadcrumb>
-                  <Breadcrumb.Item>{m.time}</Breadcrumb.Item>
-                </Breadcrumb>
-                <List
-                  loading={loading}
-                  grid={{ gutter: 16, column: 3 }}
-                  dataSource={m.events}
-                  renderItem={(event) => (
-                    <List.Item>
-                      <Card size='small' style={{ marginTop: 16 }}>
-                        <List.Item.Meta
-                          avatar={
-                            event.sport == 'Futbol'
-                              ? '⚽'
-                              : event.sport == 'Tenis'
-                              ? '🥎'
-                              : '🚴🏼‍♂️'
-                          }
-                          title={event.sport}
-                          description={event.country + ' - ' + event.league}
-                        />
-                        <Meta
-                          title={
-                            <a
-                              href={'https://apuestas.wplay.co' + event.link}
-                              target='_blank'
-                            >
-                              {event.match}
-                            </a>
-                          }
-                          // description={event.title}
-                        />
-                      </Card>
-                    </List.Item>
-                  )}
-                />
-              </div>
-            ))}
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          Ant Design ©2018 Created by Ant UED
-        </Footer>
-      </Layout>
-    </Layout>
+    <CustomLayout>
+      {loading && <Skeleton />}
+      {!loading && (
+        <>
+          <BackTop />
+          <Select
+            mode='multiple'
+            allowClear
+            style={{width: '90%'}}
+            placeholder='Please select'
+            defaultValue={[
+              'Futbol,Italia -Serie A -',
+              'Futbol,Reino Unido -Inglaterra - Premier League -',
+              'Futbol,España -La Liga -',
+              'Futbol,Américas -Argentina - Copa de la Liga Profesional -',
+              'Futbol,Américas -Colombia - Primera A -',
+            ]}
+            onChange={onSelect}>
+            {children}
+          </Select>
+          <Button
+            type='primary'
+            shape='circle'
+            icon={<SyncOutlined />}
+            style={{float: 'right', marginTop: '1%'}}
+            onClick={handleUpdate}
+          />
+        </>
+      )}
+      {data.length > 0 &&
+        matches.map((m, i) => (
+          <div key={i}>
+            <Breadcrumb>
+              <Breadcrumb.Item>{m.time}</Breadcrumb.Item>
+            </Breadcrumb>
+            <List
+              loading={loading}
+              grid={{gutter: 16, column: 3}}
+              dataSource={m.events}
+              renderItem={event => (
+                <List.Item>
+                  <Card size='small' style={{marginTop: 16}}>
+                    <List.Item.Meta
+                      avatar={event.sport == 'Futbol' ? '⚽' : event.sport == 'Tenis' ? '🥎' : '🚴🏼‍♂️'}
+                      title={event.sport}
+                      description={event.country + ' - ' + event.league}
+                    />
+                    <Meta
+                      title={
+                        <a href={'https://apuestas.wplay.co' + event.link} target='_blank'>
+                          {event.match}
+                        </a>
+                      }
+                      // description={event.title}
+                    />
+                  </Card>
+                </List.Item>
+              )}
+            />
+          </div>
+        ))}
+    </CustomLayout>
   );
 }
